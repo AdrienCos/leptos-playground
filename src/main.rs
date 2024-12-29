@@ -31,6 +31,8 @@ fn App() -> impl IntoView {
             }>"This is a child prop"</TakesChildren>
 
             {no_macro_counter(1, 17, 3)}
+
+            <RadialProgress />
         </div>
     }
 }
@@ -128,9 +130,15 @@ fn ButtonArray(#[prop(default = 5)] length: u16) -> impl IntoView {
             {counters
                 .map(|signal| {
                     view! {
-                        <button class="btn bg-secondary" on:click=move |_| {
-                            *signal.write() += 1;
-                        }>"Click me: " {signal}</button>
+                        <button
+                            class="btn bg-secondary"
+                            on:click=move |_| {
+                                *signal.write() += 1;
+                            }
+                        >
+                            "Click me: "
+                            {signal}
+                        </button>
                     }
                 })
                 .collect_view()}
@@ -305,4 +313,43 @@ fn no_macro_counter(initial: i32, max: i32, step: i32) -> impl IntoView {
             )),
         )
         .into_view()
+}
+
+#[component]
+fn RadialProgress() -> impl IntoView {
+    let (value, set_value) = signal(0u32);
+
+    let increment_1 = move |_: MouseEvent| *set_value.write() += 1;
+    let increment_5 = move |_: MouseEvent| *set_value.write() += 5;
+    let increment_10 = move |_: MouseEvent| *set_value.write() += 10;
+    let reset = move |_: MouseEvent| set_value.set(0);
+
+    view! {
+        <Card title="Radial Progress">
+            <div class="grid justify-items-center p-4">
+                <div
+                    role="progressbar"
+                    style=("--value", move || value.get().to_string())
+                    class="radial-progress bg-secondary text-secondary-content border-4 border-secondary"
+                >
+                    {move || value.get()}
+                    "%"
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <button class="btn" on:click=increment_1>
+                    "+1"
+                </button>
+                <button class="btn" on:click=increment_5>
+                    "+5"
+                </button>
+                <button class="btn" on:click=increment_10>
+                    "+10"
+                </button>
+                <button class="btn" on:click=reset>
+                    "Reset"
+                </button>
+            </div>
+        </Card>
+    }
 }
