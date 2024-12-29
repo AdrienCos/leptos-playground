@@ -1,6 +1,6 @@
 use leptos::{
-    ev::{MouseEvent, SubmitEvent},
-    html::{self},
+    ev::{self, MouseEvent, SubmitEvent},
+    html::{self, button, div, h1, span},
     prelude::*,
 };
 
@@ -11,32 +11,68 @@ fn main() {
 
 #[component]
 fn App() -> impl IntoView {
+    view! {
+        <div class="grid grid-cols-4 gap-4 p-4 bg-base">
+            <Counter />
+            <ButtonArray />
+            <ButtonArray length=2 />
+
+            <TextField />
+            <TextForm />
+
+            <Selector length=6 />
+
+            <NumberInput />
+
+            <ContextDemo />
+
+            <TakesChildren render_prop=|| {
+                view! { <p>"This is a render prop"</p> }
+            }>"This is a child prop"</TakesChildren>
+
+            {no_macro_counter(1, 17, 3)}
+        </div>
+    }
+}
+
+#[component]
+fn Card(title: &'static str, children: Children) -> impl IntoView {
+    view! {
+        <div class="card shadow-lg bg-base-300">
+            <div class="card-body">
+                <h1 class="card-title">{title}</h1>
+                {children()}
+            </div>
+        </div>
+    }
+}
+
+#[component]
+fn Counter() -> impl IntoView {
     let (count, set_count) = signal(0);
 
     let log2_count = Signal::derive(move || ((count.get() as f32).log2() * 100.0) as i32);
 
     view! {
-        <button on:click=move |_| *set_count.write() += 1>Increase by 1</button>
-        <button on:click=move |_| *set_count.write() -= 1>Decrease by 1</button>
-        <button on:click=move |_| *set_count.write() *= 2>Double</button>
-        <p class=("red", move || count.get() % 2 == 1)>"Current value : " {count}</p>
-        <p>"Double current value : " {move || count.get() * 2}</p>
-        <div>
-            <ProgressBar value=count />
-            <ProgressBar max=10 value=count />
-            <ProgressBar max=800 value=log2_count />
-        </div>
-        <ButtonArray />
-        <ButtonArray length=2 />
+        <Card title="Counter">
+            <button class="btn" on:click=move |_| *set_count.write() += 1>
+                Increase by 1
+            </button>
+            <button class="btn" on:click=move |_| *set_count.write() -= 1>
+                Decrease by 1
+            </button>
+            <button class="btn" on:click=move |_| *set_count.write() *= 2>
+                Double
+            </button>
+            <p class=("red", move || count.get() % 2 == 1)>"Current value : " {count}</p>
+            <p>"Double current value : " {move || count.get() * 2}</p>
+            <div>
+                <ProgressBar value=count />
+                <ProgressBar max=10 value=count />
+                <ProgressBar max=800 value=log2_count />
+            </div>
 
-        <TextField />
-        <TextForm />
-
-        <Selector length=6 />
-
-        <NumberInput />
-
-        <ContextDemo />
+        </Card>
     }
 }
 
@@ -45,12 +81,15 @@ fn TextField() -> impl IntoView {
     let (name, set_name) = signal("Jane Doe".to_string());
 
     view! {
-        <input
-            type="text"
-            on:input:target=move |ev| { set_name.set(ev.target().value()) }
-            prop:value=name
-        />
-        <p>"Name is " {name}</p>
+        <Card title="Text Field">
+            <input
+                class="input"
+                type="text"
+                on:input:target=move |ev| { set_name.set(ev.target().value()) }
+                prop:value=name
+            />
+            <p>"Name is " {name}</p>
+        </Card>
     }
 }
 
@@ -70,11 +109,13 @@ fn TextForm() -> impl IntoView {
     };
 
     view! {
-        <form on:submit=on_submit>
-            <input type="text" value=name node_ref=input_element />
-            <input type="submit" value="Submit" />
-        </form>
-        <p>"Name is " {name}</p>
+        <Card title="Text Form">
+            <form class="form-control space-y-2" on:submit=on_submit>
+                <input class="input" type="text" value=name node_ref=input_element />
+                <input class="btn btn-sm btn-outline" type="submit" value="Submit" />
+            </form>
+            <p>"Name is " {name}</p>
+        </Card>
     }
 }
 
@@ -83,17 +124,17 @@ fn ButtonArray(#[prop(default = 5)] length: u16) -> impl IntoView {
     let counters = (1..=length).map(|_| RwSignal::new(0));
 
     view! {
-        <div>
+        <Card title="Button Array">
             {counters
                 .map(|signal| {
                     view! {
-                        <button on:click=move |_| {
+                        <button class="btn bg-secondary" on:click=move |_| {
                             *signal.write() += 1;
                         }>"Click me: " {signal}</button>
                     }
                 })
                 .collect_view()}
-        </div>
+        </Card>
     }
 }
 
@@ -107,7 +148,7 @@ fn ProgressBar(
     max: u16,
 ) -> impl IntoView {
     view! {
-        <progress max=max value=value />
+        <progress class="progress" max=max value=value />
         <br />
     }
 }
@@ -130,29 +171,36 @@ fn Selector(#[prop()] length: u16) -> impl IntoView {
     };
 
     view! {
-        <select
-            prop:value=selected
-            on:change:target=move |ev| {
-                set_selected.set(ev.target().value().parse().unwrap());
-            }
-        >
-            {options_view}
-        </select>
-        <button on:click=reset_selector>"Reset selector"</button>
-        <button on:click=increment_selector>"Increment selector"</button>
+        <Card title="Selector">
+            <select
+                class="select select-secondary"
+                prop:value=selected
+                on:change:target=move |ev| {
+                    set_selected.set(ev.target().value().parse().unwrap());
+                }
+            >
+                {options_view}
+            </select>
+            <button class="btn" on:click=reset_selector>
+                "Reset selector"
+            </button>
+            <button class="btn" on:click=increment_selector>
+                "Increment selector"
+            </button>
+        </Card>
     }
 }
 
 #[component]
 fn NumberInput() -> impl IntoView {
-    let (value, set_value) = signal(Ok(0));
+    let (value, set_value) = signal(Ok(0i64));
 
     let success_text = view! { <p>"You entered "{value}</p> };
 
     let error_message = |errors: ArcRwSignal<Errors>| {
         view! {
-            <div class="error">
-                <p>"Not a number! Errors: "</p>
+            <p>
+                "Not a number! Errors: "
                 <ul>
                     {move || {
                         errors
@@ -162,17 +210,20 @@ fn NumberInput() -> impl IntoView {
                             .collect::<Vec<_>>()
                     }}
                 </ul>
-            </div>
+            </p>
         }
     };
 
     view! {
-        <h1>"Error handling"</h1>
-        <input
-            type="text"
-            on:input:target=move |ev| { set_value.set(ev.target().value().parse()) }
-        />
-        <ErrorBoundary fallback=error_message>{success_text}</ErrorBoundary>
+        <Card title="Error Handling">
+            <input
+                class="input input-bordered"
+                type="text"
+                on:input:target=move |ev| { set_value.set(ev.target().value().parse()) }
+                value=0
+            />
+            <ErrorBoundary fallback=error_message>{success_text}</ErrorBoundary>
+        </Card>
     }
 }
 
@@ -182,8 +233,10 @@ fn ContextDemo() -> impl IntoView {
     provide_context(set_toggled);
 
     view! {
-        <ContextDemoButton />
-        <ContextDemoText toggled=toggled />
+        <Card title="Context Demo">
+            <ContextDemoButton />
+            <ContextDemoText toggled=toggled />
+        </Card>
     }
 }
 
@@ -204,5 +257,52 @@ fn ContextDemoText(#[prop()] toggled: ReadSignal<bool>) -> impl IntoView {
 #[component]
 fn ContextDemoButton() -> impl IntoView {
     let setter = use_context::<WriteSignal<bool>>().expect("No setter provided");
-    view! { <button on:click=move |_| setter.update(|value| *value = !*value)>"Toggle"</button> }
+    view! {
+        <button class="btn btn-primary" on:click=move |_| setter.update(|value| *value = !*value)>
+            "Toggle"
+        </button>
+    }
+}
+
+#[component]
+fn TakesChildren<F, IV>(render_prop: F, children: Children) -> impl IntoView
+where
+    F: Fn() -> IV + std::marker::Send + 'static,
+    IV: IntoView + 'static,
+{
+    view! {
+        <Card title="Takes Children">
+            <h2 class="text-lg">Render Props</h2>
+            {render_prop()}
+            <h2 class="text-lg">Children</h2>
+            {children()}
+        </Card>
+    }
+}
+
+fn no_macro_counter(initial: i32, max: i32, step: i32) -> impl IntoView {
+    let (value, set_value) = signal(initial);
+
+    let reset = move |_| *set_value.write() = initial;
+    let increment = move |_| set_value.update(|value| *value = (*value + step) % max);
+    let decrement = move |_| set_value.update(|value| *value = (*value - step) % max);
+
+    div()
+        .class("card shadow-lg bg-base-300")
+        .child(
+            div().class("card-body").child((
+                h1().class("card-title").child("NoMacro"),
+                button().class("btn").on(ev::click, reset).child("Reset"),
+                button()
+                    .class("btn")
+                    .on(ev::click, increment)
+                    .child(("+", step)),
+                button()
+                    .class("btn")
+                    .on(ev::click, decrement)
+                    .child(("-", step)),
+                span().child(("Value: ", value)),
+            )),
+        )
+        .into_view()
 }
