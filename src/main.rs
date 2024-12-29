@@ -1,8 +1,11 @@
+use async_components::{AsyncLoader, SuspendedAsyncLoader, TransitionAsyncLoad};
 use leptos::{
     ev::{self, MouseEvent, SubmitEvent},
     html::{self, button, div, h1, span},
     prelude::*,
 };
+
+mod async_components;
 
 fn main() {
     console_error_panic_hook::set_once();
@@ -33,6 +36,10 @@ fn App() -> impl IntoView {
             {no_macro_counter(1, 17, 3)}
 
             <RadialProgress />
+
+            <AsyncLoader />
+            <SuspendedAsyncLoader />
+            <TransitionAsyncLoad/>
         </div>
     }
 }
