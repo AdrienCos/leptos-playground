@@ -15,6 +15,6 @@ module.exports = {
 	},
 	plugins: [require("daisyui")],
 	daisyui: {
-		themes: [catppuccin("latte", { primary: "sky", secondary: "lavender" })],
+		themes: [catppuccin("frappe", { primary: "sky", secondary: "lavender" })],
 	},
 };

@@ -4,6 +4,10 @@ use leptos::{
     html::{self, button, div, h1, span},
     prelude::*,
 };
+use leptos_router::{
+    components::{Route, Router, Routes},
+    path,
+};
 
 mod async_components;
 
@@ -15,32 +19,51 @@ fn main() {
 #[component]
 fn App() -> impl IntoView {
     view! {
-        <div class="grid grid-cols-4 gap-4 p-4 bg-base">
-            <Counter />
-            <ButtonArray />
-            <ButtonArray length=2 />
+        <Router>
+            <div class="grid grid-cols-4 gap-4 p-4 bg-base">
+                <Routes fallback=|| "Not found...">
+                    <Route path=path!("/") view=Counter />
+                    <Route path=path!("/about") view=RadialProgress />
+                    <Route path=path!("/async") view=AsyncPage />
+                </Routes>
+            </div>
 
-            <TextField />
-            <TextForm />
+            <div class="grid grid-cols-4 gap-4 p-4 bg-base">
+                <Counter />
+                <ButtonArray />
+                <ButtonArray length=2 />
 
-            <Selector length=6 />
+                <TextField />
+                <TextForm />
 
-            <NumberInput />
+                <Selector length=6 />
 
-            <ContextDemo />
+                <NumberInput />
 
-            <TakesChildren render_prop=|| {
-                view! { <p>"This is a render prop"</p> }
-            }>"This is a child prop"</TakesChildren>
+                <ContextDemo />
 
-            {no_macro_counter(1, 17, 3)}
+                <TakesChildren render_prop=|| {
+                    view! { <p>"This is a render prop"</p> }
+                }>"This is a child prop"</TakesChildren>
 
-            <RadialProgress />
+                {no_macro_counter(1, 17, 3)}
 
-            <AsyncLoader />
-            <SuspendedAsyncLoader />
-            <TransitionAsyncLoad/>
-        </div>
+                <RadialProgress />
+
+                <AsyncLoader />
+                <SuspendedAsyncLoader />
+                <TransitionAsyncLoad />
+            </div>
+        </Router>
+    }
+}
+
+#[component]
+fn AsyncPage() -> impl IntoView {
+    view! {
+        <AsyncLoader />
+        <SuspendedAsyncLoader />
+        <TransitionAsyncLoad />
     }
 }
 
@@ -138,7 +161,7 @@ fn ButtonArray(#[prop(default = 5)] length: u16) -> impl IntoView {
                 .map(|signal| {
                     view! {
                         <button
-                            class="btn bg-secondary"
+                            class="btn bg-secondary text-secondary-content"
                             on:click=move |_| {
                                 *signal.write() += 1;
                             }

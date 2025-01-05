@@ -66,10 +66,7 @@ pub fn SuspendedAsyncLoader() -> impl IntoView {
                 "Increment price"
             </button>
 
-            <Suspense fallback=fallback>
-                "Total price is "
-                {resolved_value}
-            </Suspense>
+            <Suspense fallback=fallback>"Total price is " {resolved_value}</Suspense>
         </Card>
     }
 }
@@ -90,10 +87,7 @@ pub fn TransitionAsyncLoad() -> impl IntoView {
                 "Increment count"
             </button>
 
-            <Transition fallback=fallback>
-                "Count is "
-                {resolved_value}
-            </Transition>
+            <Transition fallback=fallback>"Count is " {resolved_value}</Transition>
         </Card>
     }
 }
