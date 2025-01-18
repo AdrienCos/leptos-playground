@@ -3,6 +3,12 @@ name = "leptos-tutorial"
 version = "0.1.0"
 edition = "2021"
 
+[[bin]]
+name = "leptos-tutorial"
+bench = false
+test = false
+path = "src/main.rs"
+
 [dependencies]
 console_error_panic_hook = "0.1.7"
 gloo-timers = { version = "0.3.0", features = ["futures"] }

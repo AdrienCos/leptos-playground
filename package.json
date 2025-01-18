@@ -1,6 +1,10 @@
 {
-  "devDependencies": {
-    "@catppuccin/daisyui": "^1.2.1",
-    "daisyui": "^4.12.23"
-  }
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4",
+		"@catppuccin/daisyui": "^1.2.1",
+		"@playwright/test": "^1.49.1",
+		"@types/node": "^22.10.7",
+		"daisyui": "^4.12.23",
+		"serve": "14.2.4"
+	}
 }

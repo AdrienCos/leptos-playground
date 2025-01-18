@@ -19,6 +19,7 @@ fn main() {
 #[component]
 fn App() -> impl IntoView {
     view! {
+        <title>Leptos Tutorial</title>
         <Router>
             <div class="grid grid-cols-4 gap-4 p-4 bg-base">
                 <Routes fallback=|| "Not found...">
@@ -27,6 +28,8 @@ fn App() -> impl IntoView {
                     <Route path=path!("/async") view=AsyncPage />
                 </Routes>
             </div>
+
+            <a href="/async">Go to async</a>
 
             <div class="grid grid-cols-4 gap-4 p-4 bg-base">
                 <Counter />
